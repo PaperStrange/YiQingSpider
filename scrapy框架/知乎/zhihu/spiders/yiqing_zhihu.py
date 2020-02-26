@@ -24,39 +24,42 @@ class YiQingZhihuSpider(RedisSpider):
     name = 'yiqing_zhihu'
     allowed_domains = ['zhihu.com']
     base_url = 'https://www.zhihu.com/api/v4/search_v3?t=general&q={}&correction=1&offset={}&limit=20'
-    Key_words = [
-        '防护服',
-        '医用手套',
-        '体温枪',
-        '洗手液',
-        '口罩',
-        '假口罩',
-        '假物资',
-        '假物流',
-        '假募捐',
-        '假消息',        
-        '假筹款',
-        '虚假+口罩',        
-        '虚假+物资',
-        '虚假+物流',
-        '虚假+募捐',
-        '虚假+消息',
-        '虚假+筹款',
-        '奸商',
-        '贵',
-        '死贵',
-        '没良心',
-        '无良',
-        '无良商家',
-        '没底线',
-        '国难财',
-        '被查',
-        '被抓',
-        '被罚',
-        '曝光',
-        '谣言',
-        '辟谣'
-        ]
+    Key_words = []
+    with open("./keywords.txt", 'rb') as f: 
+        Key_words.append(f.read())
+    # Key_words = [
+    #     '防护服',
+    #     '医用手套',
+    #     '体温枪',
+    #     '洗手液',
+    #     '口罩',
+    #     '假口罩',
+    #     '假物资',
+    #     '假物流',
+    #     '假募捐',
+    #     '假消息',        
+    #     '假筹款',
+    #     '虚假+口罩',        
+    #     '虚假+物资',
+    #     '虚假+物流',
+    #     '虚假+募捐',
+    #     '虚假+消息',
+    #     '虚假+筹款',
+    #     '奸商',
+    #     '贵',
+    #     '死贵',
+    #     '没良心',
+    #     '无良',
+    #     '无良商家',
+    #     '没底线',
+    #     '国难财',
+    #     '被查',
+    #     '被抓',
+    #     '被罚',
+    #     '曝光',
+    #     '谣言',
+    #     '辟谣'
+    #     ]
     PATH_TITLE = '//*[@class="QuestionHeader-title"]/text()'
     PATH_AUTHOR = '//div[@class="Popover"]/div/a/text()'
     PATH_AUTHOR_URL = '//div[@class="Popover"]/div/a/@href'
