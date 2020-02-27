@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 import re
 import scrapy
-import json
+# import json
 import time, datetime
 import random
-from requests import Session
-from urllib.parse import urlencode
+# from requests import Session
+# from urllib.parse import urlencode
 from scrapy_redis.spiders import RedisSpider
 # from wx_gzh.settings import HEADERS, START_TIME
 from wx_gzh.items import WxGzhItem
 
 import hashlib
 from pyquery import PyQuery as pq
-from requests import ReadTimeout, ConnectionError
 import sys
 sys.setrecursionlimit(1000000)
 
@@ -20,7 +19,7 @@ sys.setrecursionlimit(1000000)
 class YiqingWxGzhSpider(RedisSpider):
     name = 'yiqing_wx_gzh'
     allowed_domains = ['sogou.com']
-    base_url = 'https://weixin.sogou.com/weixin?{}'
+    base_url = 'https://weixin.sogou.com/weixin?type={}&s_from=input&query={}'
     base_headers = {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
         'Accept-Encoding': 'gzip, deflate',
@@ -33,17 +32,17 @@ class YiqingWxGzhSpider(RedisSpider):
         'User-Agent': ''
     }
     custom_settings = {
-        'DOWNLOAD_DELAY': 10, #每个request的间隔
-        'CONCURRENT_REQUESTS': 3, #线程数
+        'DOWNLOAD_DELAY': 10,  #每个request的间隔
+        'CONCURRENT_REQUESTS': 1,  #线程数
         'CONCURRENT_REQUESTS_PER_IP': 16,
-        'SCHEDULER_PERSIST': True,
+        # 'SCHEDULER_PERSIST': True,
         'DOWNLOAD_TIMEOUT': 5,
         'DOWNLOADER_MIDDLEWARES': {
             # 'wx_gzh.middlewares.RandomProxy': 565,
             'wx_gzh.middlewares.RandomUserAgentMiddleware': 400,
         },
         'ITEM_PIPELINES': {
-            'wx_gzh.pipelines.WxGzhPipeline': 100,
+            # 'wx_gzh.pipelines.WxGzhPipeline': 100,
             'scrapy_redis.pipelines.RedisPipeline': 300
         }
     }
@@ -55,20 +54,22 @@ class YiqingWxGzhSpider(RedisSpider):
         'url':[],
         'summary':[]
     }
-    session = Session()
+    # session = Session()
     url_temp = ""
-    START_TIME = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days=14)).timetuple())) #只爬取这个时间戳之后的数据，目前设置为2周前
+    START_TIME = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days=14)).timetuple()))  #只爬取这个时间戳之后的数据，目前设置为2周前
     empt = 0
+    # keywords= []
+    # with open("./keywords.txt", 'rb') as f:
+    #     keywords.append(f.readline().decode())
 
 
     def start_requests(self):
-        with open("./keywords.txt", 'rb') as f: 
+        with open("./keywords.txt", 'rb') as f:
             keywords = f.read()
-            count = 0
-            for each_word in keywords.decode().split('\n'):
-                print("正在爬取的关键词：", each_word)
-                params = {'type': 2, 'query': each_word}
-                start_url = self.base_url.format(urlencode(params))  
+            for keyword in keywords.decode().split('\n'):
+                # count = 0
+                print("正在爬取的关键词：", keyword)
+                start_url = self.base_url.format(2, keyword)
                 print("正在爬取的搜索页：", start_url)
                 # 设置跳过指定页面
                 # if count == 1:
@@ -81,28 +82,23 @@ class YiqingWxGzhSpider(RedisSpider):
                 #     params['page'] = 93
                 # else:
                 #     pass
-                # print("爬取搜索页：", self.base_url.format(urlencode(params)))      
+                # print("爬取搜索页：", self.base_url.format(urlencode(params)))
                 self.url_temp = start_url
                 # self.update_request(start_url, self.init_headers())
                 yield scrapy.Request(
-                    url=start_url,
+                    url=self.url_temp,
                     callback=self.parse,
-                    dont_filter=True
+                    dont_filter=False
                 )
-                self.news = {
-                    'source':[],
-                    'title':[],
-                    'gzh':[],
-                    'public_time':[],
-                    'url':[],
-                    'summary':[]
-                }
                 # TODO 2020/02/25-2:25: how to deal the failure during the scrapy yield?
 
     def parse(self, response):  
-        # TODO 2020/2/24-23:35: check the format of "response.url" 
-        if 'com/antispider' in response.text:
-            headers_ = self.update_cookie(self.init_headers())                     
+        # TODO 2020/2/24-23:35: check the format of "response.url"
+        # if u'出错了' in response.text:
+        if 'com/antispider' in response.url:
+            headers_ = self.update_cookie(self.init_headers())
+            print("---------------------------------------------------")
+            print(self.url_temp)
             yield scrapy.Request(
                 headers=headers_,
                 url=self.url_temp,
@@ -124,7 +120,7 @@ class YiqingWxGzhSpider(RedisSpider):
             a = item.find("h3 a")
             url = a.attr('href')
             if not re.match('https://', url):
-                url = url.replace('http:','https:',1)
+                url = url.replace('http:', 'https:', 1)
             if not re.match('https://', url):
                 url = 'https://weixin.sogou.com' + url
             title = a.text()
@@ -172,19 +168,17 @@ class YiqingWxGzhSpider(RedisSpider):
     #     self.session.headers.update(headers)
     #     resp = self.session.get(
     #         start_url_,
-    #         # proxies = {
+    #         # proxies={
     #         #     'http': "http://127.0.0.1:8888",
     #         #     'https': "http://127.0.0.1:8888"},
-    #         verify = False
+    #         verify=False
     #     )
     #     if 'com/antispider' in resp.url:
-    #         # 更新cookies
     #         headers_ = self.update_cookie(headers)
     #         time.sleep(15)
     #         self.update_request(start_url_, headers_)
     #     else:
     #         pass
-        
 
     def init_headers(self):
         headers = self.base_headers
@@ -210,15 +204,14 @@ class YiqingWxGzhSpider(RedisSpider):
             "User-Agent, Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; en) Presto/2.8.131 Version/11.11",
             "User-Agent, Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv,2.0.1) Gecko/20100101 Firefox/4.0.1"
         ]
-        useragent = random.choice(USER_AGENT)
-        headers['User-Agent'] = useragent
+        headers['User-Agent'] = random.choice(USER_AGENT)
         return headers
 
     def update_cookie(self, headers):
         headers_ = headers
         while True:
             print("请输入验证码...并更新：cookies.txt")
-            code = int(input("请确定修改，确认完毕后请输入数字1："))  #TODO 2020/2/25-1:05: need validation?
+            input("请确定修改，确认完毕后请输入数字1：")  #TODO 2020/2/25-1:05: need validation?
             with open("cookies.txt", 'rb') as f:
                 cookie = f.read().decode()
                 if cookie and cookie != '' and cookie != headers_["Cookie"] : 
