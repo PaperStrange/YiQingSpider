@@ -14,13 +14,13 @@ NEW_DATA_FILEPATH = "spiders/new_data/"
 
 class WxGzhPipeline(object):
     def process_item(self, item, spider):
+        print("----------------------------------------------------")
+        print(item)
         count_ = len(item["gzh"])
         if count_:
             news = [{'source':item["source"][i], 'title':item["title"][i], 'gzh':item["gzh"][i], 'public_time':item["public_time"][i], 'url':item["url"][i], 'summary':item["summary"][i]} for i in range(count_)]
         else:
             news = [{'source':"", 'title':"", 'gzh':"", 'public_time':"", 'url':"", 'summary':""}]
-        print("----------------------------------------------------")
-        print(news)
         if news[0]['gzh']:
             for each_data in news:
                 # url = each_data['url']

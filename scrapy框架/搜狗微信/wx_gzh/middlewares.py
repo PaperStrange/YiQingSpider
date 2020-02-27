@@ -14,10 +14,12 @@ from scrapy import signals
 
 class RandomProxy(object):
     def process_request(self, request, spider):
+        # 设置redis代理
         # R = redis.Redis(host='127.0.0.1', port=6379, db=1, decode_responses=True)
         # IP = R.rpop('test')
-        # R.lpush(IP,'test')
+        # R.lpush(IP, 'test')
         # request.meta['proxy'] = IP
+        
         proxy = {
             'ip_prot' :"127.0.0.1:8888", 
             'user_passwd' : ""
@@ -55,8 +57,9 @@ class RandomUserAgentMiddleware(object):
             "User-Agent, Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; en) Presto/2.8.131 Version/11.11",
             "User-Agent, Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv,2.0.1) Gecko/20100101 Firefox/4.0.1"
         ]
-        useragent = random.choice(USER_AGENT)
-        request.headers.setdefault("User-Agent", useragent)
+        request.headers["User-Agent"] = random.choice(USER_AGENT)
+        # request.headers.setdefault("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0")
+        request.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0"
         request.headers["Accept"] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
         request.headers["Accept-Encoding"] = 'gzip, deflate'
         request.headers["Accept-Language"] = 'zh-CN,zh;q=0.8,en;q=0.6,ja;q=0.4,zh-TW;q=0.2,mt;q=0.2'
@@ -66,7 +69,7 @@ class RandomUserAgentMiddleware(object):
         request.headers["Upgrade-Insecure-Requests"] = 1
         with open("cookies.txt", 'rb') as f:
             request.headers["Cookie"] = f.read().decode()
-        # print(useragent)
+        # print(request.headers)
 
     def process_exception(self, request, exception, spider):
         return request
