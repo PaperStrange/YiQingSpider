@@ -24,49 +24,13 @@ class YiQingZhihuSpider(RedisSpider):
     name = 'yiqing_zhihu'
     allowed_domains = ['zhihu.com']
     base_url = 'https://www.zhihu.com/api/v4/search_v3?t=general&q={}&correction=1&offset={}&limit=20'
-    Key_words = []
-    with open("./keywords.txt", 'rb') as f: 
-        Key_words.append(f.read())
-    # Key_words = [
-    #     '防护服',
-    #     '医用手套',
-    #     '体温枪',
-    #     '洗手液',
-    #     '口罩',
-    #     '假口罩',
-    #     '假物资',
-    #     '假物流',
-    #     '假募捐',
-    #     '假消息',        
-    #     '假筹款',
-    #     '虚假+口罩',        
-    #     '虚假+物资',
-    #     '虚假+物流',
-    #     '虚假+募捐',
-    #     '虚假+消息',
-    #     '虚假+筹款',
-    #     '奸商',
-    #     '贵',
-    #     '死贵',
-    #     '没良心',
-    #     '无良',
-    #     '无良商家',
-    #     '没底线',
-    #     '国难财',
-    #     '被查',
-    #     '被抓',
-    #     '被罚',
-    #     '曝光',
-    #     '谣言',
-    #     '辟谣'
-    #     ]
     PATH_TITLE = '//*[@class="QuestionHeader-title"]/text()'
     PATH_AUTHOR = '//div[@class="Popover"]/div/a/text()'
     PATH_AUTHOR_URL = '//div[@class="Popover"]/div/a/@href'
     PATH_TIME = '//div[@class="ContentItem-time"]/a/span/text()'
     custom_settings = {
-        'DOWNLOAD_DELAY': 10, # 每个request的间隔
-        'CONCURRENT_REQUESTS': 3, # 线程数
+        'DOWNLOAD_DELAY': 10,  # 每个request的间隔
+        'CONCURRENT_REQUESTS': 3,  # 线程数
         'CONCURRENT_REQUESTS_PER_IP': 16,
         'SCHEDULER_PERSIST': True,
         'DOWNLOAD_TIMEOUT': 5,
@@ -78,15 +42,23 @@ class YiQingZhihuSpider(RedisSpider):
             'scrapy_redis.pipelines.RedisPipeline': 300
         }
     }
+
+    keywords = []
+    with open("./keywords.txt", 'rb') as f:
+        keywords.append(f.readline().decode())
     
     def start_requests(self):
-        for key in self.Key_words:
-            for num in range(0,200,20):
-                yield scrapy.Request(
-                    url=self.base_url.format(key,str(num)),
-                    callback=self.parse,
-                    dont_filter=True
-                )
+        with open("./keywords.txt", 'rb') as f:
+            keywords = f.read()
+            for key in keywords.decode().split('\n'):
+                print("---------------------------------------------------")
+                print("正在爬取的关键词是： {}".format(key))
+                for num in range(0, 200, 20):
+                    yield scrapy.Request(
+                        url=self.base_url.format(key, str(num)),
+                        callback=self.parse,
+                        dont_filter=True
+                    )
 
     def parse(self, response):
         response_json = json.loads(response.text)
