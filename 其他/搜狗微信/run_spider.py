@@ -23,7 +23,7 @@ __redis = redis.Redis(host=REDIS_HOST, port= REDIS_PORT, password=REDIS_PASS, db
 OLD_DATA_FILEPATH = "./old_data/"
 NEW_DATA_FILEPATH = "./new_data/"
 
-START_TIME = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days=14)).timetuple())) #只爬取这个时间戳之后的数据，目前设置为2周前
+START_TIME = int(time.mktime((datetime.datetime.now() - datetime.timedelta(days=14)).timetuple()))  #只爬取这个时间戳之后的数据，目前设置为2周前
 # USER_AGENT = [
 #     "User-Agent, Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",
 #     "User-Agent, Mozilla/5.0 (iPad; U; CPU OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",
@@ -56,7 +56,7 @@ headers = {
     'Upgrade-Insecure-Requests': '1',
     'User-Agent': ''}
 # headers['User-Agent'] = random.choice(USER_AGENT)
-headers['User-Agent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0"
+headers['User-Agent'] = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3452.0 Safari/537.36"
 with open("cookies.txt", 'rb') as f:
     headers["Cookie"] = f.read().decode()
 
@@ -116,21 +116,21 @@ class Spider():
             a = item.find("h3 a")
             url = a.attr('href')
             if not re.match('https://', url):
-                url = url.replace('http:','https:',1)
+                url = url.replace('http:', 'https:', 1)
             if not re.match('https://', url):
                 url = 'https://weixin.sogou.com' + url
             title = a.text()
             desp = item.find('.txt-info').text()
             account = item.find('.account').text()
             ts = int(item.find('.s2').text()[28:-3])
-            if ts > START_TIME :
+            if ts > START_TIME:
                 
                 date = pase_date(ts)
                 data = {
                     'title': title,
                     'description': desp,
                     'account': account,
-                    'date':date,
+                    'date': date,
                     'url': url
                 }
                 news.append(data)
