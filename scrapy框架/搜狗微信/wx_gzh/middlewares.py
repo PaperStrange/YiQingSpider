@@ -15,24 +15,24 @@ from scrapy import signals
 class RandomProxy(object):
     def process_request(self, request, spider):
         # 设置redis代理
-        # R = redis.Redis(host='127.0.0.1', port=6379, db=1, decode_responses=True)
-        # IP = R.rpop('test')
-        # R.lpush(IP, 'test')
-        # request.meta['proxy'] = IP
+        R = redis.Redis(host='127.0.0.1', port=6379, db=3, decode_responses=True)
+        IP = R.rpop('test')
+        R.lpush(IP, 'test')
+        request.meta['proxy'] = IP
         
-        proxy = {
-            'ip_prot' :"127.0.0.1:8888", 
-            'user_passwd' : ""
-        }
-        if proxy['user_passwd']:
-            # 对账户密码进行base64编码转换
-            base64_userpasswd = base64.b64encode(proxy['user_passwd'])
-            # 对应到代理服务器的信令格式里
-            request.headers['Proxy-Authorization'] = 'Basic ' + base64_userpasswd
-            request.meta['proxy'] = "http://" + proxy['ip_port']
-        else:
-            # 没有代理账户验证的代理使用方式
-            request.meta['proxy'] = "http://" + proxy['ip_port']
+        # proxy = {
+        #     'ip_prot' :"127.0.0.1:8888",
+        #     'user_passwd' : ""
+        # }
+        # if proxy['user_passwd']:
+        #     # 对账户密码进行base64编码转换
+        #     base64_userpasswd = base64.b64encode(proxy['user_passwd'])
+        #     # 对应到代理服务器的信令格式里
+        #     request.headers['Proxy-Authorization'] = 'Basic ' + base64_userpasswd
+        #     request.meta['proxy'] = "http://" + proxy['ip_port']
+        # else:
+        #     # 没有代理账户验证的代理使用方式
+        #     request.meta['proxy'] = "http://" + proxy['ip_port']
 
 
 class RandomUserAgentMiddleware(object):  
