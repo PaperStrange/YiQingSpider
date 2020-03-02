@@ -135,35 +135,34 @@ class Spider():
                 }
                 news.append(data)
             
-        for data in news :
+        for data in news:
             url = data["url"]
             title = data["title"]
             data["url"] = self.update_url(url)
             if not os.path.isfile(OLD_DATA_FILEPATH + hashlib.new('md5', title.encode(encoding='UTF-8')).hexdigest() + ".txt"):
                 try:
-                
                     fo = open(NEW_DATA_FILEPATH + hashlib.new('md5', title.encode(encoding='UTF-8')).hexdigest()+".txt", "w")
                     fo.write(json.dumps(data))
                     fo.close()
                     print("新增：{}".format(title))
                 except:
-                    #print(data)
+                    # print(data)
                     print("写入失败")
             else:
                 print("重复：{}".format(title))
-            #time.sleep(1)
+            time.sleep(5)
          
-        next = doc('#sogou_next').attr('href')
-        if next:
-            if not re.match('https://', next):
-                next = self.base_url + next
-            #print("下一页：",next)
+        next_page = doc('#sogou_next').attr('href')
+        if next_page:
+            if not re.match('https://', next_page):
+                next_page = self.base_url + next_page
+            print("下一页：", next_page)
             if len(news) > 0:
                 self.empt = 0
                 self.start_url = next
                 self.start()
-            elif self.empt < 4 :
-                self.empt +=1
+            elif self.empt < 4:
+                self.empt += 1
                 self.start_url = next
                 self.start()
     
@@ -191,7 +190,7 @@ if __name__ == '__main__':
             i += 1
             print("爬取关键词：", kw)
             sp.keyword = kw
-            # 设置跳过
+            # 设置页面跳过
             # if i == 1:
             #     #params['page'] = 10
             #     continue
@@ -204,3 +203,4 @@ if __name__ == '__main__':
             #     pass
             sp.start_url = sp.base_url.format(2, sp.keyword)
             sp.start()
+            time.sleep(5)
