@@ -71,7 +71,7 @@ def get_proxy():
 
 def pase_date(ts):
     timeArray = time.localtime(ts)
-    otherStyleTime = time.strftime("%Y-%m-%d", timeArray)
+    otherStyleTime = time.strftime("%Y/%m/%d", timeArray)  # Keep the same style of excel setting
     return otherStyleTime
 
 class Spider():
@@ -159,11 +159,11 @@ class Spider():
             print("下一页：", next_page)
             if len(news) > 0:
                 self.empt = 0
-                self.start_url = next
+                self.start_url = next_page
                 self.start()
             elif self.empt < 4:
                 self.empt += 1
-                self.start_url = next
+                self.start_url = next_page
                 self.start()
     
     def update_url(self, url):
