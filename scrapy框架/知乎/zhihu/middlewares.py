@@ -10,19 +10,19 @@ from scrapy import signals
 
 
 class RandomUserAgentMiddleware(object):  
-    # def get_proxy(self):
-    #     '''
-    #     请自定义代理池
-    #     '''
-    #     R = redis.Redis(host='127.0.0.1', port=6379, db=0, decode_responses=True)
-    #     IP = R.rpop('test')
-    #     R.lpush(IP,'test')
-    #     return IP
+    def get_proxy(self):
+        '''
+        请自定义代理池
+        '''
+        R = redis.Redis(host='127.0.0.1', port=6379, db=7, decode_responses=True)
+        IP = R.rpop('test')
+        R.lpush(IP,'test')
+        return IP
     
     def process_request(self, request, spider):
         # 本地IP抓取则注释
-        # proxy =self.get_proxy()
-        # request.meta['proxy'] = 'http://'+proxy
+        proxy =self.get_proxy()
+        request.meta['proxy'] = 'http://' + proxy
 
         USER_AGENT = [
             "User-Agent, Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5",

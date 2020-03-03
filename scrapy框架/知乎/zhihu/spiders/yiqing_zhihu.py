@@ -30,7 +30,7 @@ class YiQingZhihuSpider(RedisSpider):
     PATH_TIME = '//div[@class="ContentItem-time"]/a/span/text()'
     custom_settings = {
         'DOWNLOAD_DELAY': 10,  # 每个request的间隔
-        'CONCURRENT_REQUESTS': 3,  # 线程数
+        'CONCURRENT_REQUESTS': 5,  # 线程数
         'CONCURRENT_REQUESTS_PER_IP': 16,
         'SCHEDULER_PERSIST': True,
         'DOWNLOAD_TIMEOUT': 5,
@@ -42,10 +42,6 @@ class YiQingZhihuSpider(RedisSpider):
             'scrapy_redis.pipelines.RedisPipeline': 300
         }
     }
-
-    keywords = []
-    with open("./keywords.txt", 'rb') as f:
-        keywords.append(f.readline().decode())
     
     def start_requests(self):
         with open("./keywords.txt", 'rb') as f:
@@ -93,12 +89,13 @@ class YiQingZhihuSpider(RedisSpider):
                 else:
                     url = 'https://api.zhihu.com/articles/{}'.format(id)
             yield scrapy.Request(
-                url=url,callback=self.parse_,
-                meta={'description':description},
+                url=url,
+                callback=self.parse_,
+                meta={'description': description},
                 dont_filter=False
             )
     
-    def parse_(self,response):
+    def parse_(self, response):
         if 'api' in response.url:
             item = ProjectItem()
             response_json = json.loads(response.text)
@@ -139,7 +136,6 @@ class YiQingZhihuSpider(RedisSpider):
         else:
             item = ProjectItem()
             item['source'] = '知乎'
-            # item['description'] = response.meta['description']
             try:
                 temp = re.findall('<(.*)>', response.meta['description'])[0]
                 description = response.meta['description'].replace(temp, '').strip('<>')

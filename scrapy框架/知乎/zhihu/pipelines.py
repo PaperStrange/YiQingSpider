@@ -6,10 +6,11 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 import csv
 import re
-import datetime
+import time, datetime
 
 
 CURRENT_DATE = datetime.datetime.now()
+START_DATE = int(time.mktime((CURRENT_DATE- datetime.timedelta(days=14)).timetuple())) 
 FILENAME = '知乎_{}-{}-{}.csv'.format(str(CURRENT_DATE.year), str(CURRENT_DATE.month), str(CURRENT_DATE.day))
 
 class ZhihuPipeline(object):
@@ -19,11 +20,17 @@ class ZhihuPipeline(object):
         else:
             with open(FILENAME, 'a+', newline='', encoding='utf_8') as f:
                 fieldnames = [
-                    'source', 'title', 'url', 'time', 'author', 'author_url', 'description'
-                    ]
+                    'source', 
+                    'title', 
+                    'author',
+                    'time', 
+                    'url', 
+                    'description', 
+                    'author_url', 
+                    'importance'
+                ]
                 writer = csv.DictWriter(f, fieldnames=fieldnames)
-                if 'question' not in item['url']:
-                    
+                if 'question' not in item['url']:           
                     if '2020' in item['time']:
                         try:
                             year = re.findall('2020-(.*?)-', item['time'])[0]
@@ -38,20 +45,28 @@ class ZhihuPipeline(object):
                                         shorttime = part[0]
                                     else:
                                         shorttime = part[1]
-                                    writer.writerow(
-                                        {
-                                            'source': item['source'], 
-                                            'title': item['title'],
-                                            'author': item['author'],
-                                            'time': shorttime,
-                                            'url': item['url'],
-                                            'description': item['description'],
-                                            'author_url': item['author_url'],
-                                            'importance': "" 
-                                        }
-                                    )                                           
+                                    try:
+                                        Article_date = time.mktime(time.strptime(shorttime, "%Y-%m-%d"))
+                                    except:
+                                        print("---X----------------------------------------")
+                                        print(shorttime)
+                                    else:
+                                        if Article_date > START_DATE:                                        
+                                            writer.writerow(
+                                                {
+                                                    'source': item['source'], 
+                                                    'title': item['title'],
+                                                    'author': item['author'],
+                                                    'time': shorttime,
+                                                    'url': item['url'],
+                                                    'description': item['description'],
+                                                    'author_url': item['author_url'],
+                                                    'importance': "" 
+                                                }
+                                            )                                           
                                 else:
-                                    print(item['time'])
+                                    print("G---What's Happen？----------------------------------------")
+                                    print(item['time'])                                    
                                     writer.writerow(
                                         {
                                             'source': item['source'], 
@@ -71,20 +86,28 @@ class ZhihuPipeline(object):
                                     shorttime = part[0]
                                 else:
                                     shorttime = part[1] 
-                                writer.writerow(
-                                    {
-                                        'source': item['source'], 
-                                        'title': item['title'],
-                                        'author': item['author'],
-                                        'time': shorttime,
-                                        'url': item['url'],
-                                        'description': item['description'],
-                                        'author_url': item['author_url'],
-                                        'importance': "" 
-                                    }
-                                )                                           
+                                try:
+                                    Article_date = time.mktime(time.strptime(shorttime, "%Y-%m-%d"))
+                                except:
+                                    print("---Y----------------------------------------")
+                                    print(shorttime)
+                                else:
+                                    if Article_date > START_DATE:                                       
+                                        writer.writerow(
+                                            {
+                                                'source': item['source'], 
+                                                'title': item['title'],
+                                                'author': item['author'],
+                                                'time': shorttime,
+                                                'url': item['url'],
+                                                'description': item['description'],
+                                                'author_url': item['author_url'],
+                                                'importance': "" 
+                                            }
+                                        )                                           
                             else:
-                                print(item['time'])
+                                print("Q---What's Happen？----------------------------------------")
+                                print(item['time'])                                  
                                 writer.writerow(
                                     {
                                         'source': item['source'], 
@@ -111,16 +134,23 @@ class ZhihuPipeline(object):
                             }
                         )  
                     elif len(item['time']) < 10:
-                        writer.writerow(
-                            {
-                                'source': item['source'], 
-                                'title': item['title'],
-                                'author': item['author'],
-                                'time': '{}-{}-{}'.format(str(CURRENT_DATE.year), str(CURRENT_DATE.month), str(CURRENT_DATE.day)),
-                                'url': item['url'],
-                                'description': item['description'],
-                                'author_url': item['author_url'],
-                                'importance': "" 
-                            }
-                        ) 
+                        try:
+                            Article_date = time.mktime(time.strptime(item['time'], "%Y-%m-%d"))
+                        except:
+                            print("---Z----------------------------------------")
+                            print(item['time'])
+                        else:
+                            if Article_date > START_DATE:
+                                writer.writerow(
+                                {
+                                    'source': item['source'], 
+                                    'title': item['title'],
+                                    'author': item['author'],
+                                    'time': '{}-{}-{}'.format(str(CURRENT_DATE.year), str(CURRENT_DATE.month), str(CURRENT_DATE.day)),
+                                    'url': item['url'],
+                                    'description': item['description'],
+                                    'author_url': item['author_url'],
+                                    'importance': "" 
+                                }
+                            ) 
         return item
