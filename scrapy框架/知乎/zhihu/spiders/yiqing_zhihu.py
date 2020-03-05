@@ -47,14 +47,15 @@ class YiQingZhihuSpider(RedisSpider):
         with open("./keywords.txt", 'rb') as f:
             keywords = f.read()
             for key in keywords.decode().split('\n'):
-                print("---------------------------------------------------")
-                print("正在爬取的关键词是： {}".format(key))
-                for num in range(0, 200, 20):
-                    yield scrapy.Request(
-                        url=self.base_url.format(key, str(num)),
-                        callback=self.parse,
-                        dont_filter=True
-                    )
+                if "#" not in key:
+                    print("---------------------------------------------------")
+                    print("正在爬取的关键词是： {}".format(key))
+                    for num in range(0, 200, 20):
+                        yield scrapy.Request(
+                            url=self.base_url.format(key, str(num)),
+                            callback=self.parse,
+                            dont_filter=True
+                        )
 
     def parse(self, response):
         response_json = json.loads(response.text)

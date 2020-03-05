@@ -187,20 +187,21 @@ if __name__ == '__main__':
         env = f.read()
         i = 0
         for kw in env.decode().split('\n'):
-            i += 1
-            print("爬取关键词：", kw)
-            sp.keyword = kw
-            # 设置页面跳过
-            # if i == 1:
-            #     #params['page'] = 10
-            #     continue
-            # elif i == 2:
-            #     #params['page'] = 70
-            #     continue
-            # elif i == 3:
-            #     params['page'] = 93
-            # else:
-            #     pass
-            sp.start_url = sp.base_url.format(2, sp.keyword)
-            sp.start()
-            time.sleep(5)
+            if "#" not in kw:
+                i += 1
+                print("爬取关键词：", kw)
+                sp.keyword = kw
+                # 设置页面跳过
+                # if i == 1:
+                #     #params['page'] = 10
+                #     continue
+                # elif i == 2:
+                #     #params['page'] = 70
+                #     continue
+                # elif i == 3:
+                #     params['page'] = 93
+                # else:
+                #     pass
+                sp.start_url = sp.base_url.format(2, sp.keyword)
+                sp.start()
+                time.sleep(5)

@@ -67,30 +67,31 @@ class YiqingWxGzhSpider(RedisSpider):
         with open("./keywords.txt", 'rb') as f:
             keywords = f.read()
             for keyword in keywords.decode().split('\n'):
-                # count = 0
-                print("正在爬取的关键词：", keyword)
-                start_url = self.base_url.format(2, keyword)
-                print("正在爬取的搜索页：", start_url)
-                # 设置跳过指定页面
-                # if count == 1:
-                #     params['page'] = 10
-                #     continue
-                # elif count == 2:
-                #     params['page'] = 70
-                #     continue
-                # elif count == 3:
-                #     params['page'] = 93
-                # else:
-                #     pass
-                # print("爬取搜索页：", self.base_url.format(urlencode(params)))
-                self.url_temp = start_url
-                # self.update_request(start_url, self.init_headers())
-                yield scrapy.Request(
-                    url=self.url_temp,
-                    callback=self.parse,
-                    dont_filter=False
-                )
-                # TODO 2020/02/25-2:25: how to deal the failure during the scrapy yield?
+                if "#" not in keyword:
+                    # count = 0
+                    print("正在爬取的关键词：", keyword)
+                    start_url = self.base_url.format(2, keyword)
+                    print("正在爬取的搜索页：", start_url)
+                    # 设置跳过指定页面
+                    # if count == 1:
+                    #     params['page'] = 10
+                    #     continue
+                    # elif count == 2:
+                    #     params['page'] = 70
+                    #     continue
+                    # elif count == 3:
+                    #     params['page'] = 93
+                    # else:
+                    #     pass
+                    # print("爬取搜索页：", self.base_url.format(urlencode(params)))
+                    self.url_temp = start_url
+                    # self.update_request(start_url, self.init_headers())
+                    yield scrapy.Request(
+                        url=self.url_temp,
+                        callback=self.parse,
+                        dont_filter=False
+                    )
+                    # TODO 2020/02/25-2:25: how to deal the failure during the scrapy yield?
 
     def parse(self, response):  
         # TODO 2020/2/24-23:35: check the format of "response.url"
