@@ -60,14 +60,14 @@ headers['User-Agent'] = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36
 with open("cookies.txt", 'rb') as f:
     headers["Cookie"] = f.read().decode()
 
-def get_proxy():
-    ip = __redis.rpop("iptest")
-    __redis.lpush(ip, "iptest") 
-    proxies = {
-        'http': ip,
-        'https': ip
-    }
-    return proxies
+# def get_proxy():
+#     ip = __redis.rpop("iptest")
+#     __redis.lpush(ip, "iptest")
+#     proxies = {
+#         'http': ip,
+#         'https': ip
+#     }
+#     return proxies
 
 def pase_date(ts):
     timeArray = time.localtime(ts)
@@ -86,9 +86,9 @@ class Spider():
         # print(self.session.headers['User-Agent'])
 
         print("爬取搜索页：", self.start_url)
-        proxies = get_proxy()
-        resp = self.session.get(self.start_url, proxies=proxies, verify=False)
-        # resp = self.session.get(self.start_url, verify=False)
+        # proxies = get_proxy()
+        # resp = self.session.get(self.start_url, proxies=proxies, verify=False)
+        resp = self.session.get(self.start_url, verify=False)
         if 'com/antispider' in resp.url:
             self.update_cookies()
             self.start()
@@ -167,12 +167,12 @@ class Spider():
                 self.start()
     
     def update_url(self, url):
-        proxies = get_proxy()
+        # proxies = get_proxy()
         url += '&k=30&h=g'
         self.session.headers['Referer'] = self.base_url
         # self.session.headers['User-Agent'] = random.choice(USER_AGENT)
-        # resp = self.session.get(url, verify=False)
-        resp = self.session.get(url, proxies=proxies, verify=False)
+        resp = self.session.get(url, verify=False)
+        # resp = self.session.get(url, proxies=proxies, verify=False)
         if 'com/antispider' in resp.url:
             self.update_cookies()
             return self.update_url(url)
