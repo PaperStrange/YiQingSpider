@@ -10,7 +10,7 @@ import time, datetime
 
 
 CURRENT_DATE = datetime.datetime.now()
-START_DATE = int(time.mktime((CURRENT_DATE- datetime.timedelta(days=14)).timetuple())) 
+START_DATE = int(time.mktime((CURRENT_DATE - datetime.timedelta(days=7)).timetuple()))  # 只抓取距现在一周内的文章，考虑到知乎上文章的更新速度做出调整
 FILENAME = '知乎_{}-{}-{}.csv'.format(str(CURRENT_DATE.year), str(CURRENT_DATE.month), str(CURRENT_DATE.day))
 
 class ZhihuPipeline(object):
