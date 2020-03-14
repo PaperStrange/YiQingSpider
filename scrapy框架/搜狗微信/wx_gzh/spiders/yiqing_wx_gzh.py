@@ -38,7 +38,7 @@ class YiqingWxGzhSpider(RedisSpider):
         # 'SCHEDULER_PERSIST': True,
         'DOWNLOAD_TIMEOUT': 5,
         'DOWNLOADER_MIDDLEWARES': {
-            'wx_gzh.middlewares.RandomProxy': 100,
+            # 'wx_gzh.middlewares.RandomProxy': 100,
             'wx_gzh.middlewares.RandomUserAgentMiddleware': 400,
         },
         'ITEM_PIPELINES': {
